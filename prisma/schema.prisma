@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+ provider = "mongodb"
+  url      = env("DATABASE_URL") 
+}
+
+model User {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  username      String        @unique
+  role          Role
+  bids          Bid[]
+  lands         Land[]
+  notifications Notification[]
+}
+
+model Land {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  basinId         String @db.ObjectId
+  traderId        String @db.ObjectId
+  basin           Basin @relation(fields: [basinId], references: [id])
+  trader          User  @relation(fields: [traderId], references: [id])
+  name            String
+  neighborhood    String
+  location        String
+  priceBefore     Float
+  priceAfter      Float
+  ownerName       String
+  ownerPhone      String
+  auctions        Auction[]
+}
+
+model Basin {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  lands    Land[]
+}
+
+model Auction {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  landId        String        @db.ObjectId
+  land          Land          @relation(fields: [landId], references: [id])
+  startPrice    Float
+  bids          Bid[]
+  endAt         DateTime
+  notifications Notification[]
+  status        AuctionStatus @default(ONGOING)
+  winnerId      String?       @db.ObjectId
+}
+
+model Bid {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  auctionId String @db.ObjectId
+  amount    Float
+  user      User    @relation(fields: [userId], references: [id])
+  auction   Auction @relation(fields: [auctionId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String          @db.ObjectId
+  user      User            @relation(fields: [userId], references: [id])
+  auctionId String          @db.ObjectId
+  auction   Auction         @relation(fields: [auctionId], references: [id])
+  type      NotificationType
+  message   String
+  createdAt DateTime        @default(now())
+  read      Boolean         @default(false)
+}
+
+enum Role {
+  TRADER
+  BROWSER1
+  BROWSER2
+  ADMIN
+}
+
+enum NotificationType {
+  AUCTION_WON
+  AUCTION_ENDED
+  NEW_BID
+}
+
+enum AuctionStatus {
+  ONGOING
+  ENDED
+}
