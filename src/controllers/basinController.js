@@ -84,7 +84,6 @@ const deleteBasin = async (req, res, next) => {
       console.error('Error deleting basin file:', error);
     }
 
-    await prisma.land.updateMany({ where: { basinId: id }, data: { basinId: null } });
     await prisma.basin.delete({ where: { id } });
 
     res.json({ message: "Basin deleted" });
