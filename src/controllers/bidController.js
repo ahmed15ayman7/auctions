@@ -17,20 +17,14 @@ const placeBid = async (req, res, next) => {
 
     const auction = await prisma.auction.findUnique({ 
       where: { id: auctionId }, 
-      include: { 
-        bids: true,
-        land: {
-          include: { trader: true }
-        }
-      } 
     });
-    if (!auction) throw new Error("Auction not found");
+    if (!auction) return res.status(401).json("Auction not found");
     
     let user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new Error("User not found");
+    if (!user) return res.status(401).json("User not found");
     
     const highestBid = auction.bids.length ? Math.max(...auction.bids.map((b) => b.amount)) : auction.startPrice;
-    if (amount <= highestBid) throw new Error("Bid must be higher than current highest bid");
+    if (amount <= highestBid)return res.status(401).json("Bid must be higher than current highest bid");
 
     const bid = await prisma.bid.create({ data:{ userId, auctionId, amount } });
 
