@@ -17,6 +17,12 @@ const placeBid = async (req, res, next) => {
 
     const auction = await prisma.auction.findUnique({ 
       where: { id: auctionId }, 
+        include: { 
+        bids: true,
+        land: {
+          include: { trader: true }
+        }
+      } 
     });
     if (!auction) return res.status(401).json("Auction not found");
     
