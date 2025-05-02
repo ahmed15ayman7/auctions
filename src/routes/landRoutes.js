@@ -4,6 +4,6 @@ const { getLands, createLand,deleteLand } = require("../controllers/landControll
 const router = express.Router();
 router.get("/", getLands);
 router.post("/", createLand);
-router.delete("/", deleteLand);
+router.delete("/:id", deleteLand);
 
 module.exports = router;

@@ -26,8 +26,8 @@ model Land {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
   basinId         String @db.ObjectId
   traderId        String @db.ObjectId
-  basin           Basin @relation(fields: [basinId], references: [id])
-  trader          User  @relation(fields: [traderId], references: [id])
+  basin           Basin @relation(fields: [basinId], references: [id],onDelete: Cascade)
+  trader          User  @relation(fields: [traderId], references: [id],onDelete: Cascade)
   name            String
   neighborhood    String
   location        String
@@ -47,7 +47,7 @@ model Basin {
 model Auction {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   landId        String        @db.ObjectId
-  land          Land          @relation(fields: [landId], references: [id])
+  land          Land          @relation(fields: [landId], references: [id],onDelete: Cascade)
   startPrice    Float
   bids          Bid[]
   endAt         DateTime
@@ -61,16 +61,16 @@ model Bid {
   userId    String @db.ObjectId
   auctionId String @db.ObjectId
   amount    Float
-  user      User    @relation(fields: [userId], references: [id])
-  auction   Auction @relation(fields: [auctionId], references: [id])
+  user      User    @relation(fields: [userId], references: [id],onDelete: Cascade)
+  auction   Auction @relation(fields: [auctionId], references: [id],onDelete: Cascade)
 }
 
 model Notification {
   id        String           @id @default(auto()) @map("_id") @db.ObjectId
   userId    String          @db.ObjectId
-  user      User            @relation(fields: [userId], references: [id])
+  user      User            @relation(fields: [userId], references: [id],onDelete: Cascade)
   auctionId String          @db.ObjectId
-  auction   Auction         @relation(fields: [auctionId], references: [id])
+  auction   Auction         @relation(fields: [auctionId], references: [id],onDelete: Cascade)
   type      NotificationType
   message   String
   createdAt DateTime        @default(now())
